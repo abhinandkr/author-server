@@ -12,7 +12,11 @@ export const p = {
 router.get(p.get, async (request: Request, response: Response) => {
 	const {authorName} = request.params;
 	const birthPlace = await authorService.fetchBirthPlace(authorName);
-	return response.status(OK).json(birthPlace);
+	return response
+		.set('Access-Control-Allow-Origin', 'http://localhost:3001')
+		.json(birthPlace)
+		.status(OK);
+
 });
 
 export default router;
