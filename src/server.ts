@@ -69,7 +69,6 @@ app.use(express.static(staticDir));
 
 // Serve index.html file
 app.get('*', (_: Request, res: Response) => {
-	res.set('Access-Control-Allow-Origin', 'http://localhost:3001');
 	res.sendFile('index.html', {root: viewsDir});
 });
 

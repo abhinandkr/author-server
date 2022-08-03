@@ -1,19 +1,15 @@
 import HttpStatusCodes from 'http-status-codes';
 
-
 export abstract class CustomError extends Error {
-
 	public readonly HttpStatus = HttpStatusCodes.BAD_REQUEST;
 
-	constructor(msg: string, httpStatus: number) {
+	protected constructor(msg: string, httpStatus: number) {
 		super(msg);
 		this.HttpStatus = httpStatus;
 	}
 }
 
-
 export class ParamMissingError extends CustomError {
-
 	public static readonly Msg =
 		'One or more of the required parameters was missing.';
 	public static readonly HttpStatus = HttpStatusCodes.BAD_REQUEST;
@@ -23,14 +19,22 @@ export class ParamMissingError extends CustomError {
 	}
 }
 
-
-export class UserNotFoundError extends CustomError {
-
+export class AuthorNotFoundError extends CustomError {
 	public static readonly Msg =
-		'A user with the given id does not exists in the database.';
+		'An author with the given name does not exist in the database.';
 	public static readonly HttpStatus = HttpStatusCodes.NOT_FOUND;
 
 	constructor() {
-		super(UserNotFoundError.Msg, UserNotFoundError.HttpStatus);
+		super(AuthorNotFoundError.Msg, AuthorNotFoundError.HttpStatus);
+	}
+}
+
+export class ApiError extends CustomError {
+	public static readonly Msg =
+		'DBPedia API returned incomplete result. Check with API owner';
+	public static readonly HttpStatus = HttpStatusCodes.NOT_FOUND;
+
+	constructor() {
+		super(ApiError.Msg, ApiError.HttpStatus);
 	}
 }

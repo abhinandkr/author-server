@@ -1,9 +1,9 @@
 import axios from 'axios';
-import {ParamMissingError} from '@shared/errors';
+import {ApiError, ParamMissingError} from '@shared/errors';
 
 async function fetchBirthPlace(author: string): Promise<any> {
 	if (!author) {
-		return null;
+		throw new ParamMissingError();
 	}
 	const birthplaceObj = await getData(generateUri(author), 'birthPlace');
 	if (!birthplaceObj) {
@@ -13,14 +13,13 @@ async function fetchBirthPlace(author: string): Promise<any> {
 		return birthplaceObj;
 	}
 	if (!birthplaceObj['__deferred']['uri']) {
-		throw new ParamMissingError();
+		throw new ApiError();
 	}
 	return birthplaceObj['__deferred']['uri']
 		.split('/')
 		.pop()
 		.replaceAll('_', ' ');
 }
-
 
 async function fetchData(url: string): Promise<any> {
 	const res = await axios.get(url);
