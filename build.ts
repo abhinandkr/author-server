@@ -2,8 +2,10 @@
  * Remove old files, copy front-end ones.
  */
 
+// @ts-ignore
 import fs from 'fs-extra';
 import logger from 'jet-logger';
+// @ts-ignore
 import childProcess from 'child_process';
 
 
