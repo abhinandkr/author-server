@@ -1,5 +1,5 @@
-import axios from 'axios';
 import {ApiError, ParamMissingError} from '@shared/errors';
+import {httpGet} from '@shared/functions';
 
 async function fetchBirthPlace(author: string): Promise<any> {
 	if (!author) {
@@ -9,23 +9,27 @@ async function fetchBirthPlace(author: string): Promise<any> {
 }
 
 async function fetchData(url: string): Promise<any> {
-	const res = await axios.get(url);
-	if (!res || !res.data) {
-		throw new ApiError();
-	}
-	if (typeof res.data === 'string' || res.data instanceof String) {
-		const regex = /"http:\/\/dbpedia.org\/property\/birthPlace"[^,]*/m;
-		const data = res.data.match(regex);
-		if (!data || data.length === 0) {
-			return null;
+	try {
+		const res = await httpGet(url);
+		if (!res || !res.data) {
+			throw new ApiError();
 		}
-		const birthplaceObj = JSON.parse(`{${data[0]}}`);
-		if (!birthplaceObj) {
-			return null;
+		if (typeof res.data === 'string' || res.data instanceof String) {
+			const regex = /"http:\/\/dbpedia.org\/property\/birthPlace"[^,]*/m;
+			const data = res.data.match(regex);
+			if (!data || data.length === 0) {
+				return null;
+			}
+			const birthplaceObj = JSON.parse(`{${data[0]}}`);
+			if (!birthplaceObj) {
+				return null;
+			}
+			return [birthplaceObj];
 		}
-		return [birthplaceObj];
+		return res.data.d.results;
+	} catch (e) {
+		throw e;
 	}
-	return res.data.d.results;
 }
 
 async function getData(uri: string, property: string): Promise<any> {

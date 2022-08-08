@@ -6,6 +6,7 @@
     "lint": "eslint . --ext .ts",
     "start": "node -r module-alias/register ./dist --env=production",
     "start:dev": "nodemon",
+    "start-server-dev": "nodemon",
     "test": "nodemon --config ./spec/nodemon.json",
     "test:no-reloading": "./node_modules/.bin/ts-node -r tsconfig-paths/register ./spec"
   },
@@ -63,6 +64,7 @@
   ],
   "dependencies": {
     "@types/axios": "^0.14.0",
+    "@types/sparql-http-client": "^2.2.8",
     "axios": "^0.27.2",
     "command-line-args": "^5.2.1",
     "cookie-parser": "^1.4.6",
@@ -74,7 +76,8 @@
     "jet-logger": "^1.1.5",
     "jsonfile": "^6.1.0",
     "module-alias": "^2.2.2",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "sparql-http-client": "^2.4.1"
   },
   "devDependencies": {
     "@types/command-line-args": "^5.2.0",
