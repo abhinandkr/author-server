@@ -1,28 +1,18 @@
 import {Request, Response, Router} from 'express';
 import StatusCodes from 'http-status-codes';
 import authorService from '@services/author-service';
-import personService from '@services/person-service';
 
 // eslint-disable-next-line new-cap
 const router = Router();
 const {OK} = StatusCodes;
 
 export const p = {
-	get: '/author/:authorName',
+	get: '/author/:name',
 } as const;
 
-// router.get(p.get, async (request: Request, response: Response) => {
-// 	const {authorName} = request.params;
-// 	const birthPlace = await authorService.fetchBirthPlace(authorName);
-// 	return response
-// 		.set('Access-Control-Allow-Origin', 'http://localhost:3001')
-// 		.json(birthPlace)
-// 		.status(OK);
-// });
-
 router.get(p.get, async (request: Request, response: Response) => {
-	const {authorName} = request.params;
-	const birthPlace = await personService.getAuthorBirthPlace();
+	const {name} = request.params;
+	const birthPlace = await authorService.getBirthPlace(name);
 	return response
 		.set('Access-Control-Allow-Origin', 'http://localhost:3001')
 		.json({birthPlace})

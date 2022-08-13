@@ -1,63 +1,27 @@
-import {ApiError, ParamMissingError} from '@shared/errors';
-import {httpGet} from '@shared/functions';
+import {SPARQLQueryDispatcher} from '@shared/functions';
 
-async function fetchBirthPlace(author: string): Promise<any> {
-	if (!author) {
-		throw new ParamMissingError();
-	}
-	return await getData(generateUri(author), 'birthPlace');
-}
+async function getBirthPlace(name: string) {
+	const endpointUrl = 'https://query.wikidata.org/sparql';
+	const queriedLabel = 'birthLocationLabel';
+	const sparqlQuery = `SELECT DISTINCT ?${queriedLabel} WHERE {
+  ?item ((wdt:P31|wdt:P101|wdt:P106)/(wdt:P279*)) wd:Q482980;
+    rdfs:label "${name}"@en;
+    wdt:P19 ?birthLocation.
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+}`;
 
-async function fetchData(url: string): Promise<any> {
+	const queryDispatcher = new SPARQLQueryDispatcher(endpointUrl);
 	try {
-		const res = await httpGet(url);
-		if (!res || !res.data) {
-			throw new ApiError();
+		const res = await queryDispatcher.query(sparqlQuery);
+		if (res === null) {
+			return null;
 		}
-		if (typeof res.data === 'string' || res.data instanceof String) {
-			const regex = /"http:\/\/dbpedia.org\/property\/birthPlace"[^,]*/m;
-			const data = res.data.match(regex);
-			if (!data || data.length === 0) {
-				return null;
-			}
-			const birthplaceObj = JSON.parse(`{${data[0]}}`);
-			if (!birthplaceObj) {
-				return null;
-			}
-			return [birthplaceObj];
-		}
-		return res.data.d.results;
+		return res[queriedLabel].value;
 	} catch (e) {
 		throw e;
 	}
 }
 
-async function getData(uri: string, property: string): Promise<any> {
-	const birthPlaceData = await fetchData(uri);
-	if (!birthPlaceData || birthPlaceData.length === 0) {
-		return null;
-	}
-	const birthplaceObj = birthPlaceData[0][`http://dbpedia.org/property/${property}`];
-	if (!birthplaceObj) {
-		return null;
-	}
-	if (typeof birthplaceObj === 'string' || birthplaceObj instanceof String) {
-		return birthplaceObj;
-	}
-	if (!birthplaceObj['__deferred']['uri']) {
-		throw new ApiError();
-	}
-	return birthplaceObj['__deferred']['uri']
-		.split('/')
-		.pop()
-		.replaceAll('_', ' ');
-}
-
-function generateUri(str: string): string {
-	const name = str.replaceAll(' ', '_');
-	return `https://dbpedia.org/data/${name}.jsod`;
-}
-
 export default {
-	fetchBirthPlace,
+	getBirthPlace,
 } as const;
